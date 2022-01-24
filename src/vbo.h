@@ -14,8 +14,8 @@ class VBO
         VBO(GLfloat* vertices, GLsizeiptr size);
         VBO(std::vector<float>* vertices, GLsizeiptr size);
         VBO(std::vector<int16_t>* vertices, GLsizeiptr size);
-        VBO(std::vector<coordinate_t>* vertices, GLsizeiptr size);
         VBO(std::vector<glm::vec2>* vertices, GLsizeiptr size);
+        VBO(std::vector<vertex_t> &vertices, GLsizeiptr size);
 
         void Bind();
         void Unbind();

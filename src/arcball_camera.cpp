@@ -17,7 +17,7 @@ ArcballCamera::ArcballCamera(glm::vec3 eye, glm::vec3 lookAt, glm::vec3 upVector
     this->current_lookAt = m_lookAt;
 
     this->zoom = 45.0f;
-    this->mouse_sensitivity = 0.1f;
+    this->mouse_sensitivity = 0.15f;
     this->movement_speed_table = {0.00301973834223185, 0.008356641661610944, 0.01256503263442188, 0.033824826987196674, 0.03513840852447328, 0.03650828023675758, 0.03793707066926023, 0.03942754065184267, 0.04098259041179555, 0.04260526709243335, 0.044298772701938396, 
 0.04606647251843273, 0.047911903978904595, 0.04983878608137199, 0.05185102933154114, 0.053952746267215274, 0.05614826259584308, 0.05844212898287047, 0.06083913353098941, 0.06334431499296932, 0.06596297676352475, 
 0.0687007016986285, 0.07156336781383614, 0.07455716491655903, 0.07768861223082595, 0.08096457707692152, 0.08439229467240426, 0.0879793891254033, 0.09173389569579381, 0.09566428440487884, 0.09977948507957878, 
@@ -111,7 +111,8 @@ void ArcballCamera::processKeyboard(Camera_Movement direction, float delta_time)
     int speed_index = floor((height - 10) * 10); // Maps height (ranging from 10 to 50) to indexes from 0 to 100.
     // std::cout << height << " " << (height - 10) * 10 << " " << speed_index << " " << movement_speed_table[speed_index] << " " << movement_speed_table.size()<< "\n";
 
-    this->movement_speed = movement_speed_table[speed_index];
+    // this->movement_speed = movement_speed_table[speed_index];
+    this->movement_speed = 1.0f;
 
     float velocity = this->movement_speed * delta_time;
 
@@ -133,7 +134,7 @@ void ArcballCamera::processKeyboard(Camera_Movement direction, float delta_time)
         new_m_eye = m_eye - (m_eye - m_lookAt) * velocity;
         new_height = glm::length(new_m_eye - m_lookAt);
 
-        if (new_height > 10.0)
+        if (new_height > 0.0)
             m_eye = new_m_eye;
     }
 

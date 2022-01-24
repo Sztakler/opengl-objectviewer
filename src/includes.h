@@ -20,43 +20,13 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/quaternion.hpp>
 
-typedef struct point
-{
-    float x;
-    float y;
-    float z;
-} point;
 
-typedef struct triangle
+typedef struct vertex_t
 {
-    point p1;
-    point p2;
-    point p3;
-} triangle;
-
-/* Structure for storing geographical coordinates. */
-typedef struct coordinate_t
-{
-    double latitude;
-    double longitude;
-} coordinate_t;
-
-typedef struct vec3d
-{
-    float x;
-    float y;
-    float z;
-} vec3d;
-
-typedef struct AABB
-{
-    float Bminx;
-    float Bmaxx;
-    float Bminy;
-    float Bmaxy;
-    float Bminz;
-    float Bmaxz;
-} AABB;
+    glm::vec3 position;
+    glm::vec3 normal;
+    glm::vec2 textureUV;
+} vertex_t;
 
 typedef struct Material
 {
@@ -68,7 +38,7 @@ typedef struct Material
 
 struct DirLight {
     glm::vec3 direction;
-	
+
     glm::vec3 ambient;
     glm::vec3 diffuse;
     glm::vec3 specular;
@@ -76,11 +46,11 @@ struct DirLight {
 
 struct PointLight {
     glm::vec3 position;
-    
+
     float constant;
     float linear;
     float quadratic;
-	
+
     glm::vec3 ambient;
     glm::vec3 diffuse;
     glm::vec3 specular;
@@ -89,7 +59,7 @@ struct PointLight {
 struct SpotLight {
     glm::vec3 position;
     glm::vec3 direction;
-  
+
     glm::vec3 ambient;
     glm::vec3 diffuse;
     glm::vec3 specular;
@@ -115,6 +85,13 @@ enum Camera_Mode
 };
 
 
+
+enum Shader_Mode
+{
+    LLA,
+    ECEF
+};
+
 enum Camera_Movement
 {
     FORWARD,
@@ -125,16 +102,11 @@ enum Camera_Movement
     DOWN
 };
 
-enum Shader_Mode
-{
-    LLA,
-    ECEF
-};
-
-const float YAW         = 0.0f;
+const float YAW         = -90.0f;
 const float PITCH       =  0.0f;
 const float SPEED       =  2.5f;
 const float SENSITIVITY =  0.1f;
 const float ZOOM        =  45.0f;
+
 
 #endif

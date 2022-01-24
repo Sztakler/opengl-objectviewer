@@ -1,22 +1,22 @@
 #include "camera.h"
 
 Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch) :
-    front(glm::vec3(0, -1, 0)),
+    front(glm::vec3(0.0f, 0.0f, -1.0f)),
     movement_speed(SPEED),
     mouse_sensitivity(SENSITIVITY),
     zoom(ZOOM)
 {
     this->position = position;
     this->world_up = up;
-    this->yaw = -90.0;
-    this->pitch = 0.0;
+    this->yaw = yaw;
+    this->pitch = pitch;
 
     updateCameraVectors();
 }
 
 
 Camera::Camera(float pos_x, float pos_y, float pos_z, float up_x, float up_y, float up_z, float yaw, float pitch) :
-    front(glm::vec3(0, 0, 0)),
+    front(glm::vec3(0.0f, 0.0f, -1.0f)),
     movement_speed(SPEED),
     mouse_sensitivity(SENSITIVITY),
     zoom(ZOOM)
@@ -36,49 +36,39 @@ glm::mat4 Camera::getViewMatrix()
 
 void Camera::processKeyboard(Camera_Movement direction, float delta_time)
 {
-    float velocity = movement_speed * delta_time * position.y / 6;
-    glm::vec3 new_position;
+    float velocity = movement_speed * delta_time;
 
     previous_moves.clear();
 
-    printf("pos %f %f %f\n", position.x, position.y, position.z);
-
     if (direction == FORWARD)
     {
-        new_position = position + up * velocity;
-        if (new_position.x < 90)
-            position = new_position;
+        position += front * velocity;
+        previous_moves.push_back(FORWARD);
     }
     if (direction == BACKWARD)
     {
-        new_position = position - up * velocity;
-        if (new_position.x > -90)
-            position = new_position;
+        position -= front * velocity;
+        previous_moves.push_back(BACKWARD);
     }
     if (direction == LEFT)
     {
-        new_position = position - right * velocity;
-        if (new_position.z > -180)
-            position = new_position;
+        position -= right * velocity;
+        previous_moves.push_back(LEFT);
     }
     if (direction == RIGHT)
     {
-        new_position = position + right * velocity;
-;
-        if (new_position.z < 180)
-            position = new_position;
+        position += right * velocity;
+        previous_moves.push_back(RIGHT);
     }
     if (direction == UP)
     {
-        new_position = position - front * velocity;
-        if (new_position.y < 450)
-            position = new_position;
+        position += up * velocity;
+        previous_moves.push_back(UP);
     }
     if (direction == DOWN)
     {
-        new_position = position + front * velocity;
-        if (new_position.y > 0)
-            position = new_position;
+        position -= up * velocity;
+        previous_moves.push_back(DOWN);
     }
 }
 
@@ -107,16 +97,17 @@ void Camera::processMouseScroll(float y_offset)
     if (zoom < 1.0f)
         zoom = 1.0f;
     if (zoom > 45.0f)
-        zoom = 45.0f;
+        zoom = 45.0f; 
 }
 
 void Camera::updateCameraVectors()
 {
-    // glm::vec3 front_vector;
-    // front_vector.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-    // front_vector.y = sin(glm::radians(pitch));
-    // front_vector.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-    // front = glm::normalize(front_vector);
+    glm::vec3 front_vector;
+    front_vector.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+    front_vector.y = sin(glm::radians(pitch));
+    front_vector.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    front = glm::normalize(front_vector);
+
 
 
     // also re-calculate the Right and Up vector

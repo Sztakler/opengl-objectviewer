@@ -11,7 +11,7 @@ class Drawable
     public:
         VAO vertices_array;
         VAO normals_array;
-        
+
         VBO vertices_buffer;
         VBO normals_buffer;
 
@@ -21,7 +21,7 @@ class Drawable
         std::vector<float> normals;
         std::vector<float> data;
 
-        Material material;        
+        Material material;
 
         glm::vec3 position;
         float speed;
@@ -32,7 +32,7 @@ class Drawable
         Drawable(const char* obj_data_filename, const char* vertex_shader_filename,
                const char* fragment_shader_filename);
         Drawable(const char* obj_data_filename, const char* vertex_shader_filename,
-               const char* fragment_shader_filename, Material material);    
+               const char* fragment_shader_filename, Material material);
     public:
         void Bind();
         void Unbind();

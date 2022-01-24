@@ -1,10 +1,11 @@
 #include "drawable.h"
 
 Drawable::Drawable(const char* vertices_data_filename, const char* normals_data_filename,
-               const char* vertex_shader_filename, const char* fragment_shader_filename)
+               const char* vertex_shader_filename, const char* fragment_shader_filename) 
 {
 
     loadData(vertices_data_filename, this->vertices, 1.0);
+    // loadFromObjectFile("data/plane.obj");
     loadData(normals_data_filename, this->normals, 1.0);
 
     this->vertices_array = VAO();
@@ -17,13 +18,13 @@ Drawable::Drawable(const char* vertices_data_filename, const char* normals_data_
 
     this->shader = Shader(vertex_shader_filename, fragment_shader_filename);
 
-    this->vertices_array.link_vbo(this->vertices_buffer, 0, 3, GL_FLOAT);
-    this->normals_array.link_vbo(this->normals_buffer, 1, 3, GL_FLOAT);
+    this->vertices_array.link_vbo(this->vertices_buffer, 0, 3);
+    this->normals_array.link_vbo(this->normals_buffer, 1, 3);
 
 }
 
 Drawable::Drawable(const char* obj_data_filename, const char* vertex_shader_filename,
-               const char* fragment_shader_filename) 
+               const char* fragment_shader_filename)
 {
 
     loadFromObjectFile(obj_data_filename);
@@ -38,8 +39,8 @@ Drawable::Drawable(const char* obj_data_filename, const char* vertex_shader_file
 
     this->shader = Shader(vertex_shader_filename, fragment_shader_filename);
 
-    this->vertices_array.link_vbo(this->vertices_buffer, 0, 3, GL_FLOAT);
-    this->normals_array.link_vbo(this->normals_buffer, 1, 3, GL_FLOAT);
+    this->vertices_array.link_vbo(this->vertices_buffer, 0, 3);
+    this->normals_array.link_vbo(this->normals_buffer, 1, 3);
 
     this->position = glm::vec3(0.0, 0.0, 0.0);
 
@@ -60,8 +61,8 @@ Drawable::Drawable(const char* obj_data_filename, const char* vertex_shader_file
 
     this->shader = Shader(vertex_shader_filename, fragment_shader_filename);
 
-    this->vertices_array.link_vbo(this->vertices_buffer, 0, 3, GL_FLOAT);
-    this->normals_array.link_vbo(this->normals_buffer, 1, 3, GL_FLOAT);
+    this->vertices_array.link_vbo(this->vertices_buffer, 0, 3);
+    this->normals_array.link_vbo(this->normals_buffer, 1, 3);
 
     this->material.ambient = material.ambient;
     this->material.diffuse = material.diffuse;
@@ -96,13 +97,13 @@ void Drawable::Draw(glm::mat4* model, glm::mat4* view, glm::mat4* projection, DR
 
     // loadUniforms();
 
-    // if (transparent)
-    // {
-    //     sortTriangles(camera_position);
-    //     // this->vertices_buffer.Update(&this->vertices, this->vertices.size() * sizeof(float));
-    //     // this->normals_buffer.Update(&this->normals, this->normals.size() * sizeof(float));
-    
-    // }
+    if (transparent)
+    {
+        sortTriangles(camera_position);
+        // this->vertices_buffer.Update(&this->vertices, this->vertices.size() * sizeof(float));
+        // this->normals_buffer.Update(&this->normals, this->normals.size() * sizeof(float));
+
+    }
 
     switch (drawing_mode)
     {
@@ -153,15 +154,12 @@ bool Drawable::loadFromObjectFile(const char* filename)
 {
     std::ifstream f(filename);
     if (!f.is_open())
-    {
-        std::cout << "\033[91mCouldn't open file " << filename << "\033[0m\n";
         return false;
-    }
-    
-    std::vector<vec3d> temp_vertices;
-    std::vector<vec3d> temp_normals;
-    vec3d vn = {0.0, 0.0, 0.0};
-    vec3d v = {0.0, 0.0, 0.0};
+
+    std::vector<glm::vec3> temp_vertices;
+    std::vector<glm::vec3> temp_normals;
+    glm::vec3 vn = glm::vec3(0.0, 0.0, 0.0);
+    glm::vec3 v = glm::vec3(0.0, 0.0, 0.0);
 
     while(!f.eof())
     {
@@ -170,7 +168,7 @@ bool Drawable::loadFromObjectFile(const char* filename)
 
         std::stringstream s;
         s << line;
-    
+
 
         char junk;
 
@@ -222,7 +220,7 @@ bool Drawable::loadFromObjectFile(const char* filename)
             std::string parts[3];
 
             s >> junk >> parts[0] >> parts[1] >> parts[2];
-            
+
             for (int i = 0; i < 3; i++)
             {
                 replace(parts[i], "//", " ");
@@ -279,14 +277,12 @@ void Drawable::sortTriangles(glm::vec3 camera_position)
         vert_norm_vector.push_back(pair);
     }
 
-    
 
     std::sort(std::begin(vert_norm_vector), std::end(vert_norm_vector),
           [camera_position](const std::pair<glm::vec3, glm::vec3> &vert_a, const std::pair<glm::vec3, glm::vec3> &vert_b) {
             return glm::length(vert_a.first - camera_position) < glm::length(vert_b.first - camera_position);
           });
 
-   
     int j = 0;
     for (int i = 0; i < vert_norm_vector.size(); i++)
     {

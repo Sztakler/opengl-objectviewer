@@ -14,6 +14,7 @@ class EBO
         EBO(GLuint* indices, GLsizeiptr size);
         EBO(std::vector<int>* indices, GLsizeiptr size);
         EBO(std::vector<uint32_t>* indices, GLsizeiptr size);
+        EBO(std::vector<GLuint> &indices, GLsizeiptr size);
 
         void Bind();
         void Unbind();

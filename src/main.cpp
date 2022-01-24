@@ -10,10 +10,13 @@
 #include "ebo.h"
 #include "camera.h"
 #include "arcball_camera.h"
-#include "drawable.h"
+#include "mesh.h"
+#include "drawable_light.h"
+#include "texture.h"
+
+#include "stb_image.h"
 
 #include <GLFW/glfw3.h>
-
 
 bool first_mouse_movement = true;
 float delta_time;
@@ -48,43 +51,6 @@ void processInput(GLFWwindow *window);
 
 int main(int argc, char *argv[])
 {
-	char *map_directory;
-	std::pair<int, int> latitude_range = {1, 0};
-	std::pair<int, int> longitude_range = {1, 0};
-	int offset = 1;
-
-	printf("argc = %d\n", argc);
-
-	if (argc == 2)
-	{
-		map_directory = argv[1];
-	}
-	else if (argc == 3)
-	{
-		map_directory = argv[1];
-		offset = atoi(argv[2]);
-	}
-	else if (argc == 9)
-	{
-		map_directory = argv[1];
-		offset = atoi(argv[2]);
-		latitude_range.first = atoi(argv[4]);
-		latitude_range.second = atoi(argv[5]);
-
-		longitude_range.first = atoi(argv[7]);
-		longitude_range.second = atoi(argv[8]);
-	}
-	else
-	{
-		map_directory = "maps";
-	}
-
-	for (int i = 0; i < argc; i++)
-	{
-		printf("%s offset=%d ", argv[i], offset);
-	}
-	printf("\n");
-
 	// Initialize GLFW
 	glewExperimental = true; // Needed for core profile
 	if (!glfwInit())
@@ -130,10 +96,38 @@ int main(int argc, char *argv[])
 
 	/**************************
 	 * Create all objects
-     **************************/
+	 **************************/
+
+	Shader shader("shaders/simple.vert", "shaders/simple.frag");
+
+	std::vector<Texture> plank_textures = {
+		Texture("data/textures/planks.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE)
+	};
+
+	std::vector<Texture> metal_textures = {
+		Texture("data/textures/green_metal_rust_diff_1k.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE),
+		Texture("data/textures/green_metal_rust_spec_1k.png", "specular", 1, GL_RED, GL_UNSIGNED_BYTE)
+	};
+
+	std::vector<Texture> plank_textures_spec = {
+		Texture("data/textures/planks.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE),
+		Texture("data/textures/planksSpec.png", "specular", 1, GL_RED, GL_UNSIGNED_BYTE)
+	};
+
+
+	Mesh torus("data/models/torus.obj", "shaders/simple.vert", "shaders/simple.frag", plank_textures_spec);
+	Mesh teapot("data/models/teapot_tri.obj", "shaders/simple.vert", "shaders/simple.frag", plank_textures_spec);
+	Mesh wooden_floor("data/models/plane.obj", "shaders/simple.vert", "shaders/simple.frag", plank_textures_spec);
+	Mesh wooden_floor_spec("data/models/plane.obj", "shaders/simple.vert", "shaders/simple.frag", metal_textures);
+
+	DrawableLight pointlight("data/models/sphere.obj", "shaders/pointlight.vert", "shaders/pointlight.frag", glm::vec3(7, 4, 5));
+
 	glm::mat4 model = glm::mat4(1.0f);
 	glm::mat4 view = glm::mat4(1.0f);
 	glm::mat4 projection = glm::mat4(1.0f);
+	glm::mat4 MVP_matrix = glm::mat4(1.0f);
+
+	int mvp_location = glGetUniformLocation(shader.id, "mvp");
 
 	float rotation = 0.0f;
 	double prev_time = glfwGetTime();
@@ -143,6 +137,9 @@ int main(int argc, char *argv[])
 
 	unsigned int counter = 0;
 	// glfwSwapInterval(0); // disables VSync -- unlimited FPS
+
+	float theta = 0.0f;
+	float phi = 0.0f;
 
 	while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(window) == 0)
 	{
@@ -164,23 +161,62 @@ int main(int argc, char *argv[])
 			lastFrame = currentFrame;
 		}
 
+		theta += delta_time;
+		phi += delta_time;
+
 		processInput(window);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glClearColor(0.07f, 0.07f, 0.07f, 1.0f);
 
+		view = arcball_camera.getViewMatrix();
+		projection = glm::perspective(glm::radians(arcball_camera.zoom), (float)(SCR_WIDTH) / (float)SCR_HEIGHT, 0.01f, 100.0f);
 
 		glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
 
 		/**************************
 		 * Draw all objects
 		 **************************/
+		// torus.shader.Activate();
+		// torus.Bind();
+		// torus.Draw(&model, &view, &projection, TRIANGLES, false, arcball_camera.pos);
+		// torus.Unbind();
+
+		// plank_floor.Draw(plank_floor.shader, free_camera, model, view, projection);
+
+
+		float radius = 4.0f;
+		pointlight.position.x = cos(theta/2) * radius;
+		pointlight.position.z = sin(phi/2) * radius;
+
+		MVP_matrix = projection * view * model;
+		torus.Draw(arcball_camera, MVP_matrix, model, pointlight);
+
+		glm::mat4 model_teapot = glm::translate(model, glm::vec3(-5.0, 0.0, 0.0));
+		MVP_matrix = projection * view * model_teapot;
+		teapot.Draw(arcball_camera, MVP_matrix, model_teapot, pointlight);
+
+		glm::mat4 model_light = glm::translate(model, pointlight.position);
+		MVP_matrix = projection * view * model_light;
+		pointlight.Draw(arcball_camera, MVP_matrix);
+
+		glm::mat4 model_floor_spec = glm::translate(model, glm::vec3(0, -2, 0));
+		MVP_matrix = projection * view * model_floor_spec;
+		wooden_floor_spec.Draw(arcball_camera, MVP_matrix, model_floor_spec, pointlight);
+
+
 
 		// Swap the back buffer with the front buffer
 		glfwSwapBuffers(window);
 		// Take care of all GLFW events
 		glfwPollEvents();
 	}
+
+	// vao.Delete();
+	// vbo.Delete();
+	// ebo.Delete();
+	// planks.Delete();
+	// shader.Delete();
 
 	// Delete window before ending the program
 	glfwDestroyWindow(window);

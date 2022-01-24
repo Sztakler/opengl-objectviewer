@@ -24,18 +24,18 @@ VBO::VBO(std::vector<int16_t>* vertices, GLsizeiptr size)
     glBufferData(GL_ARRAY_BUFFER, size, &vertices->front(), GL_STATIC_DRAW);
 }
 
-VBO::VBO(std::vector<coordinate_t>* vertices, GLsizeiptr size)
+VBO::VBO(std::vector<glm::vec2>* vertices, GLsizeiptr size)
 {
     glGenBuffers(1, &id);
     glBindBuffer(GL_ARRAY_BUFFER, id);
     glBufferData(GL_ARRAY_BUFFER, size, &vertices->front(), GL_STATIC_DRAW);
 }
 
-VBO::VBO(std::vector<glm::vec2>* vertices, GLsizeiptr size)
+VBO::VBO(std::vector<vertex_t> &vertices, GLsizeiptr size)
 {
     glGenBuffers(1, &id);
     glBindBuffer(GL_ARRAY_BUFFER, id);
-    glBufferData(GL_ARRAY_BUFFER, size, &vertices->front(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, size, vertices.data(), GL_STATIC_DRAW);
 }
 
 void VBO::Bind()

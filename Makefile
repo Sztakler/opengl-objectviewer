@@ -1,11 +1,13 @@
 GPP = g++
-NAME =  heightmap
+NAME =  objviewer
 DEBUG_FLAGS = -g -Wall -Werror -O3 -I.
 LINKER_FLAGS = -lGLEW  -lGL -lglfw
 OBJ_DIR = obj
 SRC_DIR = src
 OBJ = $(OBJ_DIR)/main.o \
-	$(OBJ_DIR)/drawable.o \
+	$(OBJ_DIR)/mesh.o \
+	$(OBJ_DIR)/drawable_light.o \
+	$(OBJ_DIR)/texture.o \
 	$(OBJ_DIR)/shader.o \
 	$(OBJ_DIR)/vao.o \
 	$(OBJ_DIR)/vbo.o \
