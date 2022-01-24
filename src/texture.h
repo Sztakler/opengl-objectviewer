@@ -15,7 +15,7 @@ class Texture
         GLuint unit;
 
     public:
-        Texture(const char* image, const char* tex_type, GLenum slot, GLenum format, GLenum pixel_type);
+        Texture(const char* image, const char* tex_type, GLenum slot, GLenum pixel_type);
         Texture(const char* image, GLenum tex_type, GLuint slot, GLenum format, GLenum pixel_type);
 
     public:

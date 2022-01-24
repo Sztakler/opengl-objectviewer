@@ -3,14 +3,13 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-Texture::Texture(const char* image, const char* tex_type, GLenum slot, GLenum format, GLenum pixel_type)
+Texture::Texture(const char* image, const char* tex_type, GLenum slot, GLenum pixel_type)
 {
     type = tex_type;
 	printf("%s\n", image);
     int tex_width, tex_height, tex_nChannels;
 
     stbi_set_flip_vertically_on_load(true);
-
     unsigned char* tex_bytes = stbi_load(image, &tex_width, &tex_height, &tex_nChannels, 0);
 
     /* Create a texture. */
@@ -23,10 +22,32 @@ Texture::Texture(const char* image, const char* tex_type, GLenum slot, GLenum fo
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+    printf("%d %d %d\n", tex_width, tex_height, tex_nChannels);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tex_width, tex_height, 0, format, pixel_type, tex_bytes);
+    GLenum channels = GL_RGBA;
+    switch (tex_nChannels)
+    {
+        case 1:
+            channels = GL_RED;
+            printf("GL_RED\n");
+            break;
+        case 3:
+            channels = GL_RGB;
+            printf("GL_RGB\n");
+            break;
+        case 4:
+            channels = GL_RGBA;
+            printf("GL_RGBA\n");
+            break;
+        default:
+            channels = GL_RGB;
+            printf("GL_RGB\n");
+            break;
+    }
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tex_width, tex_height, 0, channels, pixel_type, tex_bytes);
 
 
     glGenerateMipmap(GL_TEXTURE_2D);
@@ -41,7 +62,7 @@ Texture::Texture(const char* image, GLenum tex_type, GLuint slot, GLenum format,
 
     int tex_width, tex_height, tex_nChannels;
 
-    stbi_set_flip_vertically_on_load(true);
+    // stbi_set_flip_vertically_on_load(true);
 
     unsigned char* tex_bytes = stbi_load(image, &tex_width, &tex_height, &tex_nChannels, 0);
 

@@ -52,7 +52,6 @@ void Mesh::Draw(ArcballCamera &camera, glm::mat4 &MVP_matrix, glm::mat4 &model, 
         textures[i].tex_unit(shader, (type + num).c_str(), i);
         textures[i].Bind();
     }
-    std::cout << std::endl;
 
     Material material = {
         glm::vec3(1.0, 1.0, 1.0),
@@ -81,6 +80,11 @@ void Mesh::Draw(ArcballCamera &camera, glm::mat4 &MVP_matrix, glm::mat4 &model, 
     glUniform1f(glGetUniformLocation(shader.id, "material.shininess"), material.shininess);
 
     glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+
+    for (uint32_t i = 0; i < textures.size(); i++)
+    {
+        textures[i].Unbind();
+    }
     // glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 }
 

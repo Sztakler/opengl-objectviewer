@@ -98,27 +98,30 @@ int main(int argc, char *argv[])
 	 * Create all objects
 	 **************************/
 
-	Shader shader("shaders/simple.vert", "shaders/simple.frag");
-
-	std::vector<Texture> plank_textures = {
-		Texture("data/textures/planks.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE)
+	std::vector<Texture> rusty_metal_textures = {
+		Texture("data/textures/rusty_metal_diff_2k.png", "diffuse", 0, GL_UNSIGNED_BYTE),
+		Texture("data/textures/rusty_metal_spec_2k.png", "specular", 1, GL_UNSIGNED_BYTE)
 	};
 
-	std::vector<Texture> metal_textures = {
-		Texture("data/textures/green_metal_rust_diff_1k.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE),
-		Texture("data/textures/green_metal_rust_spec_1k.png", "specular", 1, GL_RED, GL_UNSIGNED_BYTE)
+	std::vector<Texture> green_metal_textures = {
+		Texture("data/textures/green_metal_rust_diff_1k.png", "diffuse", 0, GL_UNSIGNED_BYTE),
+		Texture("data/textures/green_metal_rust_spec_1k.png", "specular", 1, GL_UNSIGNED_BYTE)
 	};
 
 	std::vector<Texture> plank_textures_spec = {
-		Texture("data/textures/planks.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE),
-		Texture("data/textures/planksSpec.png", "specular", 1, GL_RED, GL_UNSIGNED_BYTE)
+		Texture("data/textures/planks.png", "diffuse", 0, GL_UNSIGNED_BYTE),
+		Texture("data/textures/planksSpec.png", "specular", 1, GL_UNSIGNED_BYTE)
 	};
 
+	std::vector<Texture> castle_brick = {
+		Texture("data/textures/castle_brick_02_white_diff_1k.png", "diffuse", 0, GL_UNSIGNED_BYTE),
+		// Texture("data/textures/planksSpec.png", "specular", 1, GL_UNSIGNED_BYTE)
+	};
 
-	Mesh torus("data/models/torus.obj", "shaders/simple.vert", "shaders/simple.frag", plank_textures_spec);
+	Mesh torus("data/models/torus.obj", "shaders/simple.vert", "shaders/simple.frag", green_metal_textures);
+	Mesh mlemer("data/models/swiniakmlemer.obj", "shaders/simple.vert", "shaders/simple.frag", castle_brick);
 	Mesh teapot("data/models/teapot_tri.obj", "shaders/simple.vert", "shaders/simple.frag", plank_textures_spec);
-	Mesh wooden_floor("data/models/plane.obj", "shaders/simple.vert", "shaders/simple.frag", plank_textures_spec);
-	Mesh wooden_floor_spec("data/models/plane.obj", "shaders/simple.vert", "shaders/simple.frag", metal_textures);
+	Mesh wooden_floor_spec("data/models/plane.obj", "shaders/simple.vert", "shaders/simple.frag", rusty_metal_textures);
 
 	DrawableLight pointlight("data/models/sphere.obj", "shaders/pointlight.vert", "shaders/pointlight.frag", glm::vec3(7, 4, 5));
 
@@ -127,7 +130,7 @@ int main(int argc, char *argv[])
 	glm::mat4 projection = glm::mat4(1.0f);
 	glm::mat4 MVP_matrix = glm::mat4(1.0f);
 
-	int mvp_location = glGetUniformLocation(shader.id, "mvp");
+	// int mvp_location = glGetUniformLocation(shader.id, "mvp");
 
 	float rotation = 0.0f;
 	double prev_time = glfwGetTime();
@@ -177,20 +180,13 @@ int main(int argc, char *argv[])
 		/**************************
 		 * Draw all objects
 		 **************************/
-		// torus.shader.Activate();
-		// torus.Bind();
-		// torus.Draw(&model, &view, &projection, TRIANGLES, false, arcball_camera.pos);
-		// torus.Unbind();
-
-		// plank_floor.Draw(plank_floor.shader, free_camera, model, view, projection);
-
 
 		float radius = 4.0f;
 		pointlight.position.x = cos(theta/2) * radius;
 		pointlight.position.z = sin(phi/2) * radius;
 
 		MVP_matrix = projection * view * model;
-		torus.Draw(arcball_camera, MVP_matrix, model, pointlight);
+		// torus.Draw(arcball_camera, MVP_matrix, model, pointlight);
 
 		glm::mat4 model_teapot = glm::translate(model, glm::vec3(-5.0, 0.0, 0.0));
 		MVP_matrix = projection * view * model_teapot;
@@ -201,9 +197,14 @@ int main(int argc, char *argv[])
 		pointlight.Draw(arcball_camera, MVP_matrix);
 
 		glm::mat4 model_floor_spec = glm::translate(model, glm::vec3(0, -2, 0));
+		model_floor_spec = glm::rotate(model_floor_spec, (float)glm::radians(90.0), glm::vec3(0, 1, 0));
 		MVP_matrix = projection * view * model_floor_spec;
 		wooden_floor_spec.Draw(arcball_camera, MVP_matrix, model_floor_spec, pointlight);
 
+		glm::mat4 model_mlemer = glm::translate(model, glm::vec3(0, 0, 0));
+		model_mlemer = glm::rotate(model_mlemer, theta / 4, glm::vec3(0, 1, 0));
+		MVP_matrix = projection * view * model_mlemer;
+		mlemer.Draw(arcball_camera, MVP_matrix, model_mlemer, pointlight);
 
 
 		// Swap the back buffer with the front buffer
@@ -211,12 +212,6 @@ int main(int argc, char *argv[])
 		// Take care of all GLFW events
 		glfwPollEvents();
 	}
-
-	// vao.Delete();
-	// vbo.Delete();
-	// ebo.Delete();
-	// planks.Delete();
-	// shader.Delete();
 
 	// Delete window before ending the program
 	glfwDestroyWindow(window);
