@@ -17,7 +17,7 @@ in vec2 texUV;
 uniform sampler2D diffuse0;
 uniform sampler2D specular0;
 
-struct Material {
+struct Material { 
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
@@ -47,12 +47,6 @@ void main()
 	vec3 norm = normalize(normal);
 	vec3 viewDirection = normalize(cameraPosition - pos);
 	vec3 lightDirection = normalize(pointlight.position - pos);
-
-	// float diffuse = max(dot(norm, lightDirection), 0.0f);
-	// vec3 result = CalcPointLight(light, material, norm, pos, viewDirection);
-	// vec3 result = CalcPointLight(light, material, norm, pos, viewDirection);
-
-	// FragColor = texture(diffuse0, texUV) * vec4(pointlight.diffuse, 1.0) * diffuse;
 
 	vec3 lightDir = normalize(pointlight.position - pos);
     // diffuse shading

@@ -88,6 +88,70 @@ void Mesh::Draw(ArcballCamera &camera, glm::mat4 &MVP_matrix, glm::mat4 &model, 
     // glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 }
 
+void Mesh::Draw(ArcballCamera &camera, glm::mat4 &MVP_matrix, glm::mat4 &model, DrawableLight light, float delta_time)
+{
+    shader.Activate();
+    vao.Bind();
+
+    uint32_t n_diffuse = 0;
+    uint32_t n_specular = 0;
+
+    for (uint32_t i = 0; i < textures.size(); i++)
+    {
+        std::string num;
+        std::string type = textures[i].type;
+
+        if (type == "diffuse")
+        {
+            num = std::to_string(n_diffuse++);
+        }
+        else if (type == "specular")
+        {
+            num = std::to_string(n_specular++);
+        }
+
+        textures[i].tex_unit(shader, (type + num).c_str(), i);
+        textures[i].Bind();
+    }
+
+    Material material = {
+        glm::vec3(1.0, 1.0, 1.0),
+        glm::vec3(1.0, 1.0, 1.0),
+        glm::vec3(1.0, 1.0, 1.0),
+        16.0f};
+
+    /* Send time data to shader. */
+    glUniform1f(glGetUniformLocation(shader.id, "delta_time"), delta_time);
+
+    /* Send camera position to shader. */
+    glUniform3fv(glGetUniformLocation(shader.id, "cameraPosition"), 1, glm::value_ptr(camera.pos));
+
+    /* Send MVP matrix to shader. */
+    glUniformMatrix4fv(glGetUniformLocation(shader.id, "mvp"), 1, GL_FALSE, glm::value_ptr(MVP_matrix));
+    glUniformMatrix4fv(glGetUniformLocation(shader.id, "model"), 1, GL_FALSE, glm::value_ptr(model));
+
+    glUniform3fv(glGetUniformLocation(shader.id, "pointlight.position"), 1, glm::value_ptr(light.position));
+    glUniform3fv(glGetUniformLocation(shader.id, "pointlight.ambient"), 1, glm::value_ptr(light.ambient));
+    glUniform3fv(glGetUniformLocation(shader.id, "pointlight.diffuse"), 1, glm::value_ptr(light.diffuse));
+    glUniform3fv(glGetUniformLocation(shader.id, "pointlight.specular"), 1, glm::value_ptr(light.specular));
+    glUniform1f(glGetUniformLocation(shader.id, "pointlight.constant"), light.constant);
+    glUniform1f(glGetUniformLocation(shader.id, "pointlight.linear"), light.linear);
+    glUniform1f(glGetUniformLocation(shader.id, "pointlight.quadratic"), light.quadratic);
+
+    glUniform3fv(glGetUniformLocation(shader.id, "material.ambient"), 1, glm::value_ptr(material.ambient));
+    glUniform3fv(glGetUniformLocation(shader.id, "material.diffuse"), 1, glm::value_ptr(material.diffuse));
+    glUniform3fv(glGetUniformLocation(shader.id, "material.specular"), 1, glm::value_ptr(material.specular));
+    glUniform1f(glGetUniformLocation(shader.id, "material.shininess"), material.shininess);
+
+    glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+
+    for (uint32_t i = 0; i < textures.size(); i++)
+    {
+        textures[i].Unbind();
+    }
+    // glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+}
+
 bool Mesh::loadFromObjectFile(const char *filename)
 {
     std::ifstream f(filename);

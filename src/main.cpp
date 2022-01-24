@@ -118,8 +118,7 @@ int main(int argc, char *argv[])
 		// Texture("data/textures/planksSpec.png", "specular", 1, GL_UNSIGNED_BYTE)
 	};
 
-	Mesh torus("data/models/torus.obj", "shaders/simple.vert", "shaders/simple.frag", green_metal_textures);
-	Mesh mlemer("data/models/swiniakmlemer.obj", "shaders/simple.vert", "shaders/simple.frag", castle_brick);
+	Mesh torus("data/models/torus.obj", "shaders/procedural.vert", "shaders/procedural.frag", green_metal_textures);
 	Mesh teapot("data/models/teapot_tri.obj", "shaders/simple.vert", "shaders/simple.frag", plank_textures_spec);
 	Mesh wooden_floor_spec("data/models/plane.obj", "shaders/simple.vert", "shaders/simple.frag", rusty_metal_textures);
 
@@ -185,8 +184,10 @@ int main(int argc, char *argv[])
 		pointlight.position.x = cos(theta/2) * radius;
 		pointlight.position.z = sin(phi/2) * radius;
 
-		MVP_matrix = projection * view * model;
-		// torus.Draw(arcball_camera, MVP_matrix, model, pointlight);
+		glm::mat4 model_torus = glm::rotate(model, 0.0f, glm::vec3(1, 1, 0.5));
+		MVP_matrix = projection * view * model_torus;
+		torus.Draw(arcball_camera, MVP_matrix, model_torus, pointlight, theta);
+		// printf("dt %f\n", delta_time);
 
 		glm::mat4 model_teapot = glm::translate(model, glm::vec3(-5.0, 0.0, 0.0));
 		MVP_matrix = projection * view * model_teapot;
@@ -200,11 +201,6 @@ int main(int argc, char *argv[])
 		model_floor_spec = glm::rotate(model_floor_spec, (float)glm::radians(90.0), glm::vec3(0, 1, 0));
 		MVP_matrix = projection * view * model_floor_spec;
 		wooden_floor_spec.Draw(arcball_camera, MVP_matrix, model_floor_spec, pointlight);
-
-		glm::mat4 model_mlemer = glm::translate(model, glm::vec3(0, 0, 0));
-		model_mlemer = glm::rotate(model_mlemer, theta / 4, glm::vec3(0, 1, 0));
-		MVP_matrix = projection * view * model_mlemer;
-		mlemer.Draw(arcball_camera, MVP_matrix, model_mlemer, pointlight);
 
 
 		// Swap the back buffer with the front buffer

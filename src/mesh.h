@@ -31,6 +31,7 @@ public:
 
 public:
     void Draw(ArcballCamera &camera, glm::mat4 &MVP_matrix, glm::mat4 &model, DrawableLight light);
+    void Draw(ArcballCamera &camera, glm::mat4 &MVP_matrix, glm::mat4 &model, DrawableLight light, float delta_time);
     void print_vertices();
     void print_indices();
 
