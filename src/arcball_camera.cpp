@@ -126,7 +126,7 @@ void ArcballCamera::processKeyboard(Camera_Movement direction, float delta_time)
         new_m_eye = m_eye + (m_eye - m_lookAt) * velocity;
         new_height = glm::length(new_m_eye - m_lookAt);
 
-        if (new_height < 20.0)
+        if (new_height < 50.0)
             m_eye = new_m_eye;
     }
     if (direction == DOWN)

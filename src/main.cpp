@@ -113,16 +113,31 @@ int main(int argc, char *argv[])
 		Texture("data/textures/planksSpec.png", "specular", 1, GL_UNSIGNED_BYTE)
 	};
 
-	std::vector<Texture> castle_brick = {
-		Texture("data/textures/castle_brick_02_white_diff_1k.png", "diffuse", 0, GL_UNSIGNED_BYTE),
-		// Texture("data/textures/planksSpec.png", "specular", 1, GL_UNSIGNED_BYTE)
+	std::vector<Texture> sandstone_textures = {
+		Texture("data/textures/sandstone_cracks_diff_1k.png", "diffuse", 0, GL_UNSIGNED_BYTE),
+		Texture("data/textures/sandstone_cracks_spec_1k.png", "specular", 1, GL_UNSIGNED_BYTE)
 	};
 
+	std::vector<Texture> porcelain = {
+		Texture("data/textures/Porcelain002_1K_Color.png", "diffuse", 0, GL_UNSIGNED_BYTE),
+		Texture("data/textures/Porcelain002_1K_Roughness.png", "specular", 1, GL_UNSIGNED_BYTE)
+	};	
+	
+	std::vector<Texture> noice = {
+		Texture("data/textures/noice.png", "diffuse", 0, GL_UNSIGNED_BYTE),
+		Texture("data/textures/planksSpec.png", "specular", 1, GL_UNSIGNED_BYTE)
+	};
+// 
 	Mesh torus("data/models/torus.obj", "shaders/procedural.vert", "shaders/procedural.frag", green_metal_textures);
-	Mesh teapot("data/models/teapot_tri.obj", "shaders/simple.vert", "shaders/simple.frag", plank_textures_spec);
-	Mesh wooden_floor_spec("data/models/plane.obj", "shaders/simple.vert", "shaders/simple.frag", rusty_metal_textures);
+	Mesh teapot("data/models/teapot_tri.obj", "shaders/simple.vert", "shaders/simple.frag", porcelain);
+	Mesh wooden_floor_spec("data/models/plane.obj", "shaders/simple.vert", "shaders/simple.frag", plank_textures_spec);
+	Mesh sphere("data/models/sphere_tri.obj", "shaders/simple.vert", "shaders/simple.frag", sandstone_textures);
+	Mesh noice_sphere("data/models/sphere_tri.obj", "shaders/simple.vert", "shaders/simple.frag", noice);
+	Mesh chair("data/models/chair.obj", "shaders/simple.vert", "shaders/simple.frag", noice);
 
-	DrawableLight pointlight("data/models/sphere.obj", "shaders/pointlight.vert", "shaders/pointlight.frag", glm::vec3(7, 4, 5));
+	Mesh procedural("data/models/plane.obj", "shaders/procedural2.vert", "shaders/procedural2.frag", porcelain);
+
+	DrawableLight pointlight("data/models/sphere.obj", "shaders/pointlight.vert", "shaders/pointlight.frag", glm::vec3(7, 7, 5));
 
 	glm::mat4 model = glm::mat4(1.0f);
 	glm::mat4 view = glm::mat4(1.0f);
@@ -184,12 +199,13 @@ int main(int argc, char *argv[])
 		pointlight.position.x = cos(theta/2) * radius;
 		pointlight.position.z = sin(phi/2) * radius;
 
-		glm::mat4 model_torus = glm::rotate(model, 0.0f, glm::vec3(1, 1, 0.5));
+		glm::mat4 model_torus = glm::translate(model, glm::vec3(0, 1, 0));
+		model_torus = glm::rotate(model_torus, 0.0f, glm::vec3(1, 3, 0.5));
 		MVP_matrix = projection * view * model_torus;
 		torus.Draw(arcball_camera, MVP_matrix, model_torus, pointlight, theta);
 		// printf("dt %f\n", delta_time);
 
-		glm::mat4 model_teapot = glm::translate(model, glm::vec3(-5.0, 0.0, 0.0));
+		glm::mat4 model_teapot = glm::translate(model, glm::vec3(-5.0, 3.0, 0.0));
 		MVP_matrix = projection * view * model_teapot;
 		teapot.Draw(arcball_camera, MVP_matrix, model_teapot, pointlight);
 
@@ -197,11 +213,25 @@ int main(int argc, char *argv[])
 		MVP_matrix = projection * view * model_light;
 		pointlight.Draw(arcball_camera, MVP_matrix);
 
-		glm::mat4 model_floor_spec = glm::translate(model, glm::vec3(0, -2, 0));
-		model_floor_spec = glm::rotate(model_floor_spec, (float)glm::radians(90.0), glm::vec3(0, 1, 0));
-		MVP_matrix = projection * view * model_floor_spec;
-		wooden_floor_spec.Draw(arcball_camera, MVP_matrix, model_floor_spec, pointlight);
+		// glm::mat4 model_floor_spec = glm::translate(model, glm::vec3(0, -2, 0));
+		// model_floor_spec = glm::rotate(model_floor_spec, (float)glm::radians(90.0), glm::vec3(0, 1, 0));
+		// MVP_matrix = projection * view * model_floor_spec;
+		// wooden_floor_spec.Draw(arcball_camera, MVP_matrix, model_floor_spec, pointlight);
 
+		glm::mat4 model_sphere = glm::translate(model, glm::vec3(0, 3, 3));
+		// model_sphere = glm::rotate(model_sphere, (float)glm::radians(90.0), glm::vec3(0, 1, 0));
+		MVP_matrix = projection * view * model_sphere;
+		sphere.Draw(arcball_camera, MVP_matrix, model_sphere, pointlight);
+
+		glm::mat4 model_chair = glm::translate(model, glm::vec3(0, 2, -4));
+		model_chair = glm::rotate(model_chair, (float)theta, glm::vec3(1, 1, 1));
+		MVP_matrix = projection * view * model_chair;
+		chair.Draw(arcball_camera, MVP_matrix, model_chair, pointlight);
+
+		glm::mat4 model_procedural = model;
+		// model_procedural = glm::rotate(model, (float)theta, glm::vec3(1, 0, 0));
+		MVP_matrix = projection * view * model_procedural;
+		procedural.Draw(arcball_camera, MVP_matrix, model_procedural, pointlight, theta);
 
 		// Swap the back buffer with the front buffer
 		glfwSwapBuffers(window);

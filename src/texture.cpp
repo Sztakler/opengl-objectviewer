@@ -24,26 +24,26 @@ Texture::Texture(const char* image, const char* tex_type, GLenum slot, GLenum pi
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-    printf("%d %d %d\n", tex_width, tex_height, tex_nChannels);
+    //printf("%d %d %d\n", tex_width, tex_height, tex_nChannels);
 
     GLenum channels = GL_RGBA;
     switch (tex_nChannels)
     {
         case 1:
             channels = GL_RED;
-            printf("GL_RED\n");
+      //      printf("GL_RED\n");
             break;
         case 3:
             channels = GL_RGB;
-            printf("GL_RGB\n");
+        //    printf("GL_RGB\n");
             break;
         case 4:
             channels = GL_RGBA;
-            printf("GL_RGBA\n");
+          //  printf("GL_RGBA\n");
             break;
         default:
             channels = GL_RGB;
-            printf("GL_RGB\n");
+            //printf("GL_RGB\n");
             break;
     }
 

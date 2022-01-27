@@ -51,6 +51,39 @@ float rand(vec2 c){
 #define SCR_WIDTH 1920
 #define SCR_HEIGHT 1080
 
+/* Shader autorstwa
+ * https://www.shadertoy.com/view/XsX3zB
+ *
+ * The MIT License
+ * Copyright © 2013 Nikita Miropolskiy
+ * 
+ * ( license has been changed from CCA-NC-SA 3.0 to MIT
+ *
+ *   but thanks for attributing your source code when deriving from this sample 
+ *   with a following link: https://www.shadertoy.com/view/XsX3zB )
+ *
+ * ~
+ * ~ if you're looking for procedural noise implementation examples you might 
+ * ~ also want to look at the following shaders:
+ * ~ 
+ * ~ Noise Lab shader by candycat: https://www.shadertoy.com/view/4sc3z2
+ * ~
+ * ~ Noise shaders by iq:
+ * ~     Value    Noise 2D, Derivatives: https://www.shadertoy.com/view/4dXBRH
+ * ~     Gradient Noise 2D, Derivatives: https://www.shadertoy.com/view/XdXBRH
+ * ~     Value    Noise 3D, Derivatives: https://www.shadertoy.com/view/XsXfRH
+ * ~     Gradient Noise 3D, Derivatives: https://www.shadertoy.com/view/4dffRH
+ * ~     Value    Noise 2D             : https://www.shadertoy.com/view/lsf3WH
+ * ~     Value    Noise 3D             : https://www.shadertoy.com/view/4sfGzS
+ * ~     Gradient Noise 2D             : https://www.shadertoy.com/view/XdXGW8
+ * ~     Gradient Noise 3D             : https://www.shadertoy.com/view/Xsl3Dl
+ * ~     Simplex  Noise 2D             : https://www.shadertoy.com/view/Msf3WH
+ * ~     Voronoise: https://www.shadertoy.com/view/Xd23Dh
+ * ~ 
+ *
+ */
+
+
 float noise(vec2 p, float freq ){
 	float unit = SCR_WIDTH/freq;
 	vec2 ij = floor(p/unit);
@@ -221,46 +254,16 @@ void main()
 	float value;
 	
 
-		value = simplex3d_fractal(p3*8.0+8.0);
+	value = simplex3d_fractal(p3*8.0+8.0);
 	
 	
 	value = 0.5 + 0.8*value;
 	value *= smoothstep(0.0, 0.000005, abs(0.6-p.x)); // hello, iq :)
 	
-	// FragColor = vec4(vec3(value), 1.0) * vec4(vec3(0.0549, 0.9412, 0.749), 1.0) * vec4(result, 1.0);
-	FragColor = (texture(diffuse0, texUV) * vec4(diffuse + ambient, 1.0) * vec4(vec3(value), 1.0) * 4 + texture(specular0, texUV).r * vec4(specular, 1.0));
+	FragColor = vec4(vec3(value), 1.0) * vec4(vec3(0.8, 0.6627, 0.4078), 1.0) * vec4(result, 1.0);
+	// FragColor = (texture(diffuse0, texUV) * vec4(diffuse + ambient, 1.0) * vec4(vec3(value), 1.0) * 4 + texture(specular0, texUV).r * vec4(specular, 1.0));
 	// vec3 norm = normalize(normal);
 	// vec3 viewDirection = normalize(cameraPosition - pos);
 }
 
-/* https://www.shadertoy.com/view/XsX3zB
- *
- * The MIT License
- * Copyright © 2013 Nikita Miropolskiy
- * 
- * ( license has been changed from CCA-NC-SA 3.0 to MIT
- *
- *   but thanks for attributing your source code when deriving from this sample 
- *   with a following link: https://www.shadertoy.com/view/XsX3zB )
- *
- * ~
- * ~ if you're looking for procedural noise implementation examples you might 
- * ~ also want to look at the following shaders:
- * ~ 
- * ~ Noise Lab shader by candycat: https://www.shadertoy.com/view/4sc3z2
- * ~
- * ~ Noise shaders by iq:
- * ~     Value    Noise 2D, Derivatives: https://www.shadertoy.com/view/4dXBRH
- * ~     Gradient Noise 2D, Derivatives: https://www.shadertoy.com/view/XdXBRH
- * ~     Value    Noise 3D, Derivatives: https://www.shadertoy.com/view/XsXfRH
- * ~     Gradient Noise 3D, Derivatives: https://www.shadertoy.com/view/4dffRH
- * ~     Value    Noise 2D             : https://www.shadertoy.com/view/lsf3WH
- * ~     Value    Noise 3D             : https://www.shadertoy.com/view/4sfGzS
- * ~     Gradient Noise 2D             : https://www.shadertoy.com/view/XdXGW8
- * ~     Gradient Noise 3D             : https://www.shadertoy.com/view/Xsl3Dl
- * ~     Simplex  Noise 2D             : https://www.shadertoy.com/view/Msf3WH
- * ~     Voronoise: https://www.shadertoy.com/view/Xd23Dh
- * ~ 
- *
- */
 

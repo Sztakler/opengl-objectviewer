@@ -72,6 +72,7 @@ void main()
 	vec3 result = ambient + diffuse + specular;
 
 	FragColor = texture(diffuse0, texUV) * vec4(diffuse + ambient, 1.0) + texture(specular0, texUV).r * vec4(specular, 1.0);
+    FragColor *= 1.5;
 
 }
 
